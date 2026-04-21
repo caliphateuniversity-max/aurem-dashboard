@@ -34,13 +34,21 @@ export function subscribeToJobs(callback: (payload: unknown) => void) {
 /**
  * Subscribe to generated_posts table changes.
  */
-export function subscribeToPosts(callback: (payload: unknown) => void) {
+export function subscribeToPosts(callback: () => void) {
   const channel = supabase
-    .channel('generated-posts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'generated_posts' }, callback)
+    .channel('posts')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'generated_posts' },
+      () => {
+        callback()
+      }
+    )
     .subscribe()
 
-  return () => supabase.removeChannel(channel)
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }
 
 /**

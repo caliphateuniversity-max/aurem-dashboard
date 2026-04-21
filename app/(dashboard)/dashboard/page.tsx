@@ -30,13 +30,16 @@ export default function OverviewPage() {
   )
 
   // Live updates via Supabase Realtime
-  useEffect(() => {
-    const unsub = subscribeToPosts(() => {
-      mutatePosts()
-      mutateSummary()
-    })
-    return unsub
-  }, [mutatePosts, mutateSummary])
+ useEffect(() => {
+  const unsubscribe = subscribeToPosts(() => {
+    mutatePosts()
+    mutateSummary()
+  })
+
+  return () => {
+    unsubscribe()
+  }
+}, [mutatePosts, mutateSummary])
 
   const stats = (summary as any)?.data
   const posts = (postsData as any)?.data?.posts || []
